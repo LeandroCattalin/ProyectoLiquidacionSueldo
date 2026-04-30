@@ -18,23 +18,19 @@
 *.exp
 *.res
 
-# --- Documentación y Web (HTML) ---
-# Ignoramos archivos temporales o de backup de manuales
-*.html.tmp
-*.html.bak
+# --- PRIVACIDAD Y DATOS (Recibos y Capturas) ---
+# Bloqueamos TODOS los archivos de recibos generados
+*.html
+*.htm
+*.jpg
+*.jpeg
+
+# --- Archivos Temporales de Sistema ---
 *.tmp
 *.temp
 *~
-*~.html
-
-# --- Recursos Visuales (JPG y Otros) ---
-# Ignoramos miniaturas y archivos de edición pesados
 Thumbs.db
 ehthumbs.db
-*.psd
-*.xcf
-*.raw
-*~.jpg
 
 # --- Configuración Personal (Sensible) ---
 config.ini
