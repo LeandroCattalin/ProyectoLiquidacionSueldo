@@ -27,7 +27,7 @@ Begin VB.Form frmDarBajaEmpleado
       _ExtentX        =   2990
       _ExtentY        =   661
       _Version        =   393216
-      Format          =   116391937
+      Format          =   115933185
       CurrentDate     =   46134
    End
    Begin VB.CommandButton btnDarDeBaja 
@@ -116,6 +116,7 @@ Option Explicit
 Private m_EmpleadoActual As clsEmpleado
 
 Private Sub btnDarDeBaja_Click()
+    On Error GoTo ErrHandler
     Dim mensaje As String
     Dim nuevoEstado As Boolean
     
@@ -149,6 +150,8 @@ Private Sub btnDarDeBaja_Click()
         ' Opcional: Limpiar campos o deseleccionar para evitar errores
         cboEmpleados.ListIndex = -1
     End If
+ErrHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub
 
 Private Sub Form_Load()

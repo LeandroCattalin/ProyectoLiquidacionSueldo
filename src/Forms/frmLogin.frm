@@ -115,6 +115,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 'Inicio de sesion
 Private Sub btnIniciarSesion_Click()
+    On Error GoTo ErrHandler
     'Validaciones de las textbox
     If Trim(txtUsuario.Text) = "Ingrese su nombre de usuario" Or Trim(txtContrasena.Text) = "Ingrese su contrasena" Then
         MsgBox "Por favor, complete todos los campos.", vbExclamation
@@ -132,6 +133,8 @@ Private Sub btnIniciarSesion_Click()
             txtContrasena.SetFocus
         End If
     End If
+ErrHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub
 
 'Gestion del CheckBox para mostrar la contrasena

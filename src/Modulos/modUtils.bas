@@ -21,7 +21,7 @@ Public Sub GenerarRecibosHTML(ByVal mes As Integer, ByVal anio As Integer)
     On Error GoTo ErrRec
 
     Set fso = CreateObject("Scripting.FileSystemObject")
-    pathCarpeta = App.path & "\recibos"
+    pathCarpeta = App.Path & "\recibos"
     
     If Not fso.FolderExists(pathCarpeta) Then
         fso.CreateFolder (pathCarpeta)

@@ -154,6 +154,7 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub btnGuardar_Click()
+    On Error GoTo ErrHandler
     ' 1. Validaciones (Igual que en el Alta)
     If Trim(txtDescripcion.Text) = "" Then
         MsgBox "La descripción no puede estar vacía", vbExclamation
@@ -177,4 +178,6 @@ Private Sub btnGuardar_Click()
     Else
         MsgBox "Error al actualizar el concepto", vbCritical
     End If
+ErrHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub

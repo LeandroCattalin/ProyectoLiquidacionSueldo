@@ -128,9 +128,10 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Sub btnGuardar_Click()
+    On Error GoTo ErrHandler
     Dim oCon As New clsConcepto
     
-    ' 1. Validaciones de entrada
+    ' Validaciones de entrada
     If Trim(txtDescripcion.Text) = "" Then
         MsgBox "La descripción es obligatoria", vbExclamation, "Faltan datos"
         txtDescripcion.SetFocus
@@ -143,7 +144,7 @@ Private Sub btnGuardar_Click()
         Exit Sub
     End If
 
-    ' 2. Mapeo al objeto
+    ' Mapeo al objeto
     With oCon
         .Descripcion = txtDescripcion.Text
         .MontoFijo = CDbl(IIf(txtMontoFijo.Text = "", 0, txtMontoFijo.Text))
@@ -168,6 +169,8 @@ Private Sub btnGuardar_Click()
     Else
         MsgBox "Error al intentar guardar en la base de datos", vbCritical
     End If
+ErrHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub
 
 Private Sub btnCancelar_Click()

@@ -167,7 +167,7 @@ Begin VB.Form frmPanelDeControl
             _ExtentX        =   4683
             _ExtentY        =   661
             _Version        =   393216
-            Format          =   116719617
+            Format          =   115933185
             CurrentDate     =   36526
          End
          Begin VB.CommandButton btnBajaEmpleado 
@@ -523,45 +523,6 @@ Public Property Let Modo(ByVal vNuevoValor As String)
     m_Modo = vNuevoValor
 End Property
 
-Private Sub btnGenerarRecibos_Click()
-    Dim nMes As Integer
-    Dim nAnio As Integer
-    Dim respuesta As VbMsgBoxResult
-    
-    ' 1. Validar selección
-    ' Usamos Val() para asegurarnos de que el texto de los combos se convierta a número
-    If cboMes.ListIndex = -1 Or cboAnio.ListIndex = -1 Then
-        MsgBox "Por favor, seleccione Mes y Año para generar recibos de liquidacion.", vbExclamation
-        Exit Sub
-    End If
-    
-    ' Convertimos los valores de los combos a Integer
-    nMes = CInt(cboMes.Text)
-    nAnio = CInt(cboAnio.Text)
-    
-    ' 2. Confirmación
-    ' Mostramos el periodo formateado solo para el mensaje
-    respuesta = MsgBox("¿Desea comenzar el proceso de impresion de recibos para el período " & nMes & "/" & nAnio & "?" & vbCrLf & _
-                "Esto procesará a todas las liquidaciones realizadas.", vbQuestion + vbYesNo, "Confirmar Proceso")
-    
-    If respuesta = vbYes Then
-        
-        ' UI: Reloj de arena y deshabilitar botón
-        Screen.MousePointer = vbHourglass
-        btnGenerarRecibos.Enabled = False
-        
-        ' 3. LLAMADA AL MOTOR (Enviamos los dos enteros por separado)
-        ' Esto coincide con la firma: Public Sub ProcesarLiquidacion(ByVal mes As Integer, ByVal anio As Integer)
-        Call modUtils.GenerarRecibosHTML(nMes, nAnio)
-        
-        ' 4. Finalización
-        Screen.MousePointer = vbDefault
-        btnGenerarRecibos.Enabled = True
-        
-        MsgBox ("Recibos Procesados con exito")
-    End If
-End Sub
-
 Public Sub Form_Load()
     lblEstadoSesion.Caption = "Bienvenido " & UsuarioActual.NombreCompleto & " su rol actual es: " & UsuarioActual.RolDescripcion
     tabPanelDeControl.Tab = 0
@@ -576,13 +537,48 @@ Public Sub Form_Load()
     End Select
 End Sub
 
+Private Sub btnGenerarRecibos_Click()
+    On Error GoTo ErrHandler
+    Dim nMes As Integer
+    Dim nAnio As Integer
+    Dim respuesta As VbMsgBoxResult
+    
+    ' Validar selección
+    If cboMes.ListIndex = -1 Or cboAnio.ListIndex = -1 Then
+        MsgBox "Por favor, seleccione Mes y Año para generar recibos de liquidacion.", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Convertierto los valores de los combos a Integer
+    nMes = CInt(cboMes.Text)
+    nAnio = CInt(cboAnio.Text)
+    
+    ' Muestro el periodo formateado solo para el mensaje
+    respuesta = MsgBox("¿Desea comenzar el proceso de impresion de recibos para el período " & nMes & "/" & nAnio & "?" & vbCrLf & _
+                "Esto procesará a todas las liquidaciones realizadas.", vbQuestion + vbYesNo, "Confirmar Proceso")
+    
+    If respuesta = vbYes Then
+        Screen.MousePointer = vbHourglass
+        btnGenerarRecibos.Enabled = False
+        
+        ' Llamo a la funcion para generar los recibos
+        Call modUtils.GenerarRecibosHTML(nMes, nAnio)
+        
+        Screen.MousePointer = vbDefault
+        btnGenerarRecibos.Enabled = True
+        
+        MsgBox ("Recibos Procesados con exito")
+    End If
+ErrHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
+End Sub
+
 Private Sub btnEjecutarLiquidacion_Click()
     Dim nMes As Integer
     Dim nAnio As Integer
     Dim respuesta As VbMsgBoxResult
     
-    ' 1. Validar selección
-    ' Usamos Val() para asegurarnos de que el texto de los combos se convierta a número
+    ' Validar selección
     If cboMes.ListIndex = -1 Or cboAnio.ListIndex = -1 Then
         MsgBox "Por favor, seleccione Mes y Año para liquidar.", vbExclamation
         Exit Sub
@@ -592,29 +588,23 @@ Private Sub btnEjecutarLiquidacion_Click()
     nMes = CInt(cboMes.Text)
     nAnio = CInt(cboAnio.Text)
     
-    ' 2. Confirmación
-    ' Mostramos el periodo formateado solo para el mensaje
+    ' Muestro el periodo formateado solo para el mensaje
     respuesta = MsgBox("¿Desea comenzar el proceso de liquidación para el período " & nMes & "/" & nAnio & "?" & vbCrLf & _
                 "Esto procesará a todos los empleados activos.", vbQuestion + vbYesNo, "Confirmar Proceso")
     
     If respuesta = vbYes Then
         On Error GoTo ErrLiq
         
-        ' UI: Reloj de arena y deshabilitar botón
         Screen.MousePointer = vbHourglass
         btnEjecutarLiquidacion.Enabled = False
         
-        ' 3. LLAMADA AL MOTOR (Enviamos los dos enteros por separado)
-        ' Esto coincide con la firma: Public Sub ProcesarLiquidacion(ByVal mes As Integer, ByVal anio As Integer)
+        ' Llamo a la funcion para procesar las liquidaciones
         Call modLiquidacion.ProcesarLiquidacion(nMes, nAnio)
         
-        ' 4. Finalización
         Screen.MousePointer = vbDefault
         btnEjecutarLiquidacion.Enabled = True
         
-        ' Nota: Quitamos el MsgBox de éxito de acá porque ya lo pusimos al final de ProcesarLiquidacion
-        ' así evitamos que salgan dos mensajes.
-        
+        ' Ya tengo los botones de exito en la funcion
     End If
     Exit Sub
 
@@ -692,6 +682,7 @@ Private Sub btnGuardarModificaciones_Click()
     
     'Paso los datos de los Textbox al objeto
     With m_EmpleadoActual
+        On Error GoTo ErrGuardarModificaionesHandler
         Dim SueldoTexto As String
         SueldoTexto = txtSueldoBasico.Text
         
@@ -711,10 +702,13 @@ Private Sub btnGuardarModificaciones_Click()
         cboEmpleados.Clear
         Call modUI.LlenarComboEmpleados(cboEmpleados)
     End If
+ErrGuardarModificacionesHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub
 
 'Boton para guardar la asignacion de nuevos conceptos a empleados
 Private Sub btnGuardarAsignacion_Click()
+    On Error GoTo ErrGuardarAsignacionHandler
     Dim colParaGuardar As New Collection
     Dim oCon As clsConcepto
     Dim i As Integer
@@ -747,10 +741,13 @@ Private Sub btnGuardarAsignacion_Click()
     Else
         MsgBox "Hubo un error al guardar en la base de datos.", vbCritical
     End If
+ErrGuardarAsingacionHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub
 
 'Funcion cuando activo el cboEmpleados
 Private Sub cboEmpleados_Click()
+    On Error GoTo ErrCboEmpleadosHandler
     Dim idSeleccionado As Long
     
     ' Validamos que haya una selección válida
@@ -763,6 +760,8 @@ Private Sub cboEmpleados_Click()
         ' Pasamos el ID correcto
         Call MostrarEmpleado(idSeleccionado)
     End If
+ErrCboEmpleadosHandler:
+    MsgBox "Ocurrió un error inesperado al cargar el ComboBox: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub
 
 Private Sub cboEmpleadoConceptos_Click()
@@ -802,6 +801,7 @@ End Sub
 
 'Carga al empleado en el formulario
 Private Sub MostrarEmpleado(id As Long)
+    On Error GoTo ErrMostrarEmpleadoHandler
     Dim oEmp As clsEmpleado
     Set oEmp = modEmpleados.GetEmpleadoById(id)
 
@@ -816,4 +816,6 @@ Private Sub MostrarEmpleado(id As Long)
         MsgBox "No se pudo cargar la información del empleado.", vbExclamation
     End If
     Set m_EmpleadoActual = oEmp
+ErrMotrarEmpleadoHandler:
+    MsgBox "Ocurrió un error inesperado al mostrar el empleado: " & Err.Description, vbCritical, "Error de Sistema"
 End Sub

@@ -39,7 +39,7 @@ Public Sub ProcesarLiquidacion(ByVal mes As Integer, ByVal anio As Integer)
         Next
         
         ' 3. Persistimos pasando mes y año por separado
-        Debug.Print "Procesando Empleado: " & oLiq.IdEmpleado & " - Conceptos: " & oLiq.Detalles.Count
+        Debug.Print "Procesando Empleado: " & oLiq.IdEmpleado & " - Conceptos: " & oLiq.Detalles.count
         Call GuardarLiquidacionCompleta(oLiq, mes, anio)
     Next
 

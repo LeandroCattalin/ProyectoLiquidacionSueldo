@@ -88,7 +88,7 @@ Begin VB.Form frmDarAltaEmpleado
       _ExtentX        =   4683
       _ExtentY        =   661
       _Version        =   393216
-      Format          =   116391937
+      Format          =   115933185
       CurrentDate     =   36526
    End
    Begin VB.Label lblDarDeAlta 
@@ -170,6 +170,7 @@ Private Sub btnCancelar_Click()
 End Sub
 
 Private Sub btnDarDeAlta_Click()
+    On Error GoTo ErrHandler
     Dim oNuevoEmp As New clsEmpleado
     
     ' 1. Validaciones mínimas
@@ -193,4 +194,7 @@ Private Sub btnDarDeAlta_Click()
         MsgBox "Empleado dado de alta con éxito.", vbInformation
         Unload Me
     End If
+ErrHandler:
+    MsgBox "Ocurrió un error inesperado: " & Err.Description, vbCritical, "Error de Sistema"
+End Sub
 End Sub
