@@ -24,6 +24,7 @@
 *.htm
 *.jpg
 *.jpeg
+*.png
 
 # --- Archivos Temporales de Sistema ---
 *.tmp
